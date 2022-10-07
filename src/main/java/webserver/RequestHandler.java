@@ -11,10 +11,12 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import model.User;
 import util.HttpRequestUtils;
 
 public class RequestHandler extends Thread {
@@ -34,21 +36,19 @@ public class RequestHandler extends Thread {
                 OutputStream out = connection.getOutputStream();
                 BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));) {
 
-            String url= HttpRequestUtils.getUrl(br.readLine());
-            if ("/".equals(url)) {
-                url = "index.html";
-            }
-            
-            HttpRequestUtils.logHeader(br);
-//            for (int i = 0; i < 30; i++) {
-//                System.out.println(">>>>>>>");
-//                System.out.println(i + " " + br.readLine());
-//                System.out.println("*******");
+            String path = HttpRequestUtils.getUrl(br.readLine());
+
+//            if (path.indexOf('?') > -1) {
+//                String queryString = path.substring(path.indexOf('?') + 1);
+//                Map<String, String> paramMap = HttpRequestUtils.parseQueryString(queryString);
+//                User user = new User(paramMap.get("userId"), paramMap.get("password"), paramMap.get("name"),
+//                        paramMap.get("email"));
 //            }
-            
+
+            HttpRequestUtils.logHeader(br);
+
             DataOutputStream dos = new DataOutputStream(out);
-            Path path = Paths.get(new File("./webapp").getPath(), url);
-            byte[] body = Files.readAllBytes(path);
+            byte[] body = Files.readAllBytes(new File("./webapp" + path).toPath());
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {

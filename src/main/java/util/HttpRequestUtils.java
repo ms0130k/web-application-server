@@ -27,7 +27,8 @@ public class HttpRequestUtils {
 
     public static String getUrl(String firstLine) {
         log.debug(firstLine);
-        return firstLine.split(" ")[1];
+        String path = firstLine.split(" ")[1];
+        return !"/".equals(path) ? path : "/index.html";
     }
 
     /**
