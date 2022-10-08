@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import model.User;
 import util.HttpRequestUtils;
+import util.IOUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -34,26 +35,44 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream();
                 OutputStream out = connection.getOutputStream();
-                BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+                DataOutputStream dos = new DataOutputStream(out);) {
+            String line = br.readLine();
+            log.debug("Request-Line : {}", line);
 
-            String path = HttpRequestUtils.getUrl(br.readLine());
+            if (line == null) return;
+            
+            String[] tokens = line.split(" ");
+            String uri = tokens[1];
+            
+            int contentLength = 0;
+            while (!"".equals(line)) {
+                line = br.readLine();
+                log.debug("Header: {}", line);
+                if (line.startsWith("Content-Length")) {
+                    contentLength = getContentLength(line);
+                }
+            }
+            
+            if (uri.startsWith("/user/create")) {
+                String queryString = IOUtils.readData(br, contentLength);
+                Map<String, String> args = HttpRequestUtils.parseQueryString(queryString);
+                User user = new User(args.get("userId"), args.get("password"), args.get("name"), args.get("email"));
+                log.debug("User: {}", user);
+                uri = "/index.html";
+            }
 
-//            if (path.indexOf('?') > -1) {
-//                String queryString = path.substring(path.indexOf('?') + 1);
-//                Map<String, String> paramMap = HttpRequestUtils.parseQueryString(queryString);
-//                User user = new User(paramMap.get("userId"), paramMap.get("password"), paramMap.get("name"),
-//                        paramMap.get("email"));
-//            }
-
-            HttpRequestUtils.logHeader(br);
-
-            DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = Files.readAllBytes(new File("./webapp" + path).toPath());
+            byte[] body = Files.readAllBytes(new File("./webapp" + uri).toPath());
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private int getContentLength(String line) {
+        String[] headerTokens = line.split(":");
+        return Integer.parseInt(headerTokens[1].trim());
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
@@ -71,7 +90,6 @@ public class RequestHandler extends Thread {
         try {
             dos.write(body, 0, body.length);
             dos.flush();
-            dos.close();
         } catch (IOException e) {
             log.error(e.getMessage());
         }

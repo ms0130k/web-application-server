@@ -12,8 +12,8 @@ import util.HttpRequestUtils.Pair;
 public class HttpRequestUtilsTest {
     @Test
     public void getUrl() {
-        assertThat(HttpRequestUtils.getUrl("GET / HTTP/1.1"), is("/"));
-        assertThat(HttpRequestUtils.getUrl("GET /index.html HTTP/1.1"), is("/index.html"));
+        assertThat(HttpRequestUtils.getUri("GET / HTTP/1.1"), is("/"));
+        assertThat(HttpRequestUtils.getUri("GET /index.html HTTP/1.1"), is("/index.html"));
     }
     
     @Test

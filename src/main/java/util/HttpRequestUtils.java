@@ -3,6 +3,7 @@ package util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -15,17 +16,18 @@ import com.google.common.collect.Maps;
 public class HttpRequestUtils {
     private static final Logger log = LoggerFactory.getLogger(HttpRequestUtils.class);
     
-    public static void logHeader(BufferedReader br) throws IOException {
+    public static Map<String, String> readHeader(BufferedReader br) throws IOException {
+        Map<String, String> headers = new HashMap<String, String>();
         String line;
-        int i = 0;
-//        왜 why???
-//        while ((line = br.readLine()) != null) {
         while (!"".equals(line = br.readLine())) {
             log.debug(line);
+            String[] headerTokens = line.split(": ");
+            headers.put(headerTokens[0], headerTokens[1]);
         }
+        return headers;
     }
 
-    public static String getUrl(String firstLine) {
+    public static String getUri(String firstLine) {
         log.debug(firstLine);
         String path = firstLine.split(" ")[1];
         return !"/".equals(path) ? path : "/index.html";
