@@ -2,6 +2,8 @@ package util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 public class IOUtils {
     /**
@@ -15,6 +17,7 @@ public class IOUtils {
     public static String readData(BufferedReader br, int contentLength) throws IOException {
         char[] body = new char[contentLength];
         br.read(body, 0, contentLength);
-        return String.copyValueOf(body);
+        String value = String.copyValueOf(body);
+        return URLDecoder.decode(value, "UTF-8");
     }
 }

@@ -1,8 +1,13 @@
 package util;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 
+import java.io.BufferedReader;
+import java.io.CharArrayReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.Map;
 
 import org.junit.Test;
