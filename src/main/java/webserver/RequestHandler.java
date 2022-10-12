@@ -46,10 +46,8 @@ public class RequestHandler extends Thread {
                 return;
 
             String[] tokens = line.split(" ");
-            if (tokens.length == 0)
-                return;
-            String uri = tokens[1];
-
+            String uri = getDefaultUri(tokens);
+            
             getHeader(br);
 
             if ("/user/create".equals(uri)) {
@@ -97,6 +95,14 @@ public class RequestHandler extends Thread {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private String getDefaultUri(String[] tokens) {
+        String uri = tokens[1];
+        if ("/".equals(uri)) {
+            uri =  "/index.html";
+        }
+        return uri;
     }
 
     public void responseResource(DataOutputStream dos, String uri) throws IOException {
