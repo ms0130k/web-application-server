@@ -17,8 +17,7 @@ import util.HttpRequestUtils.Pair;
 public class HttpRequest {
 
     private InputStream in;
-    private String method;
-    private String path;
+    private RequestLine requestLine;
     private Map<String, String> headers = new HashMap<String, String>();
     private Map<String, String> params = new HashMap<String, String>();
 
@@ -31,10 +30,11 @@ public class HttpRequest {
                 return;
             }
             
-            setRequestLine(line);
+//            setRequestLine(line);
+            requestLine = new RequestLine(line);
             setHeaders(br);
-            if ("GET".equals(method)) {
-                
+            if ("GET".equals(getMethod())) {
+                params = requestLine.getParams();
             } else {
                 line = br.readLine();
                 int index = Integer.parseInt(headers.get("Content-Length"));
@@ -48,11 +48,11 @@ public class HttpRequest {
     }
 
     public String getMethod() throws IOException {
-        return method;
+        return requestLine.getMethod();
     }
 
     public String getPath() {
-        return path;
+        return requestLine.getPath();
     }
 
     public String getHeader(String key) {
@@ -63,20 +63,20 @@ public class HttpRequest {
         return params.get(key);
     }
     
-    private void setRequestLine(String line) {
-        String[] requestTokens = line.split(" ");
-        method = requestTokens[0];
-        if ("GET".equals(method)) {
-            String pathAndParams = requestTokens[1];
-            String[] pathTokens = pathAndParams.split("\\?");
-            
-            path = pathTokens[0];
-            params = HttpRequestUtils.parseQueryString(pathTokens[1]);
-            return;
-        }
-        path = requestTokens[1];
-        
-    }
+//    private void setRequestLine(String line) {
+//        String[] requestTokens = line.split(" ");
+//        method = requestTokens[0];
+//        if ("GET".equals(method)) {
+//            String pathAndParams = requestTokens[1];
+//            String[] pathTokens = pathAndParams.split("\\?");
+//            
+//            path = pathTokens[0];
+//            params = HttpRequestUtils.parseQueryString(pathTokens[1]);
+//            return;
+//        }
+//        path = requestTokens[1];
+//        
+//    }
 
     private void setHeaders(BufferedReader br) throws IOException {
         String line = br.readLine();
