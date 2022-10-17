@@ -8,6 +8,9 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
 
+import http.HttpMethod;
+import http.HttpRequest;
+
 public class HttpRequestTest {
     private String testDirectory = "./src/test/resources/";
 

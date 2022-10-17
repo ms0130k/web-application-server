@@ -10,14 +10,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import db.DataBase;
+import http.HttpRequest;
+import http.HttpResponse;
 import model.User;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
-    private HttpRequest request;
-    private HttpResponse response;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -28,17 +28,18 @@ public class RequestHandler extends Thread {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream();) {
-            request = new HttpRequest(in);
-            response = new HttpResponse(out);
+            HttpRequest request = new HttpRequest(in);
+            HttpResponse response = new HttpResponse(out);
 
             String path = getDefaultUri(request.getPath());
 
             if ("/user/create".equals(path)) {
-                createUser();
+                createUser(request);
                 response.sendRedirect("/index.html");
             } else if ("/user/login".equals(path)) {
                 User user = DataBase.findUserById(request.getParameter("userId"));
                 if (user != null && user.getPassword().equals(request.getParameter("password"))) {
+                    response.addHeader("Set-Cookie", "logined=true; Path=/");
                     response.sendRedirect("/index.html");
                 } else {
                     response.forward("/user/login_failed.html");
@@ -79,7 +80,7 @@ public class RequestHandler extends Thread {
         return path;
     }
 
-    public void createUser() throws IOException {
+    public void createUser(HttpRequest request) throws IOException {
         User user = new User(request.getParameter("userId"), request.getParameter("password"),
                 request.getParameter("name"), request.getParameter("email"));
         log.debug("User: {}", user);

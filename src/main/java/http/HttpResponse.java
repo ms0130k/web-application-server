@@ -1,5 +1,5 @@
 
-package webserver;
+package http;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -47,12 +47,18 @@ public class HttpResponse {
     }
     
     public void forwardBody(String body) {
-        try {
             byte[] contents = body.getBytes();
             headers.put("Content-Type", "text/html;charset=utf-8");
             headers.put("Content-Length", contents.length + "");
             response200Header();
             responseBody(contents);
+    }
+    
+    private void response200Header() {
+        try {
+            dos.writeBytes("HTTP/1.1 200 OK\r\n");
+            processHeaders();
+            dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
         }
@@ -70,21 +76,11 @@ public class HttpResponse {
         
     }
 
-    private void responseBody(byte[] body) throws IOException {
+    private void responseBody(byte[] body) {
         try {
             dos.write(body, 0, body.length);
             dos.writeBytes("\r\n");
             dos.flush();
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void response200Header() {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK\r\n");
-            processHeaders();
-            dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
         }
