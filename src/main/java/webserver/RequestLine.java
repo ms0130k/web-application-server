@@ -1,5 +1,6 @@
 package webserver;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -9,13 +10,14 @@ import util.HttpRequestUtils;
 
 public class RequestLine {
     private static final Logger log = LoggerFactory.getLogger(RequestLine.class);
-    private String method;
+    private HttpMethod method;
     private String path;
-    private Map<String, String> params;
+    private Map<String, String> params = new HashMap<String, String>();
     public RequestLine(String line) {
+        log.debug("request line: {}", line);
         String[] tokens = line.split(" ");
-        method = tokens[0];
-        if (!"GET".equals(method)) {
+        method = HttpMethod.valueOf(tokens[0]);
+        if (method.isNotGet()) {
             path = tokens[1];
             return;
         }
@@ -23,11 +25,11 @@ public class RequestLine {
         if (index == -1) {
             path = tokens[1];
         } else {
-            path = tokens[1].substring(index);
+            path = tokens[1].substring(0, index);
             params = HttpRequestUtils.parseQueryString(tokens[1].substring(index + 1));
         }
     }
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return method;
     }
     public String getPath() {

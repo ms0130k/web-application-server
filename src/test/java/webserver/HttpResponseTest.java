@@ -12,25 +12,27 @@ public class HttpResponseTest {
     private String testDirectory = "./src/test/resources/";
     private HttpResponse response;
 
-    @Before
-    public void setHttpResponse() throws FileNotFoundException {
-        response = new HttpResponse(createOutputStream("Http_Forward.txt"));
-    }
-    
     @Test
     public void responseForward() throws FileNotFoundException {
+        getResponse("Http_Forward.txt");
         response.forward("/index.html");;
     }
     
     @Test
-    public void responseRedirect() {
+    public void responseRedirect() throws FileNotFoundException {
+        getResponse("Http_Redirect.txt");
         response.sendRedirect("/index.html");
     }
     
     @Test
-    public void responseCookies() {
+    public void responseCookies() throws FileNotFoundException {
+        getResponse("Http_Cookie.txt");
         response.addHeader("Set-Cookie", "logined=true");
         response.sendRedirect("/index.html");
+    }
+    
+    private void getResponse(String fileName) throws FileNotFoundException {
+        response = new HttpResponse(createOutputStream(fileName));
     }
 
     private OutputStream createOutputStream(String filename) throws FileNotFoundException {
