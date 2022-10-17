@@ -34,28 +34,35 @@ public class RequestHandler extends Thread {
             String path = getDefaultUri(request.getPath());
 
             if ("/user/create".equals(path)) {
-                createUser(request);
-                response.sendRedirect("/index.html");
+                createUser(request, response);
             } else if ("/user/login".equals(path)) {
-                User user = DataBase.findUserById(request.getParameter("userId"));
-                if (user != null && user.getPassword().equals(request.getParameter("password"))) {
-                    response.addHeader("Set-Cookie", "logined=true; Path=/");
-                    response.sendRedirect("/index.html");
-                } else {
-                    response.forward("/user/login_failed.html");
-                }
+                login(request, response);
             } else if ("/user/list".equals(path)) {
-                if (!request.isLogined()) {
-                    response.sendRedirect("/index.html");
-                } else {
-                    Collection<User> users = DataBase.findAll();
-                    response.forwardBody(writeUserList(users));
-                }
+                listUser(request, response);
             } else {
                 response.forward(path);
             }
         } catch (IOException e) {
             log.error(e.getMessage());
+        }
+    }
+
+    private void listUser(HttpRequest request, HttpResponse response) {
+        if (!request.isLogined()) {
+            response.sendRedirect("/index.html");
+        } else {
+            Collection<User> users = DataBase.findAll();
+            response.forwardBody(writeUserList(users));
+        }
+    }
+
+    private void login(HttpRequest request, HttpResponse response) {
+        User user = DataBase.findUserById(request.getParameter("userId"));
+        if (user != null && user.getPassword().equals(request.getParameter("password"))) {
+            response.addHeader("Set-Cookie", "logined=true; Path=/");
+            response.sendRedirect("/index.html");
+        } else {
+            response.forward("/user/login_failed.html");
         }
     }
 
@@ -80,11 +87,12 @@ public class RequestHandler extends Thread {
         return path;
     }
 
-    public void createUser(HttpRequest request) throws IOException {
+    public void createUser(HttpRequest request, HttpResponse response) throws IOException {
         User user = new User(request.getParameter("userId"), request.getParameter("password"),
                 request.getParameter("name"), request.getParameter("email"));
         log.debug("User: {}", user);
         DataBase.addUser(user);
+        response.sendRedirect("/index.html");
     }
 
 }
