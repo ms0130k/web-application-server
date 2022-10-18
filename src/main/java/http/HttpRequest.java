@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -16,38 +14,35 @@ import org.slf4j.LoggerFactory;
 
 import util.HttpRequestUtils;
 import util.IOUtils;
-import util.HttpRequestUtils.Pair;
 
 public class HttpRequest {
     private final Logger log = LoggerFactory.getLogger(HttpRequest.class);
     private RequestLine requestLine;
-    private Map<String, String> headers = new HashMap<String, String>();
-    private Map<String, String> params = new HashMap<String, String>();
+    private HttpHeader header = new HttpHeader();
+    private RequestParam param = new RequestParam();
+    
     private Map<String, String> cookies = new HashMap<String, String>();
 
     public HttpRequest(InputStream in) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-            String line = br.readLine();
-            if (line == null) {
-                return;
-            }
-
-            requestLine = new RequestLine(line);
-            setHeaders(br);
+            requestLine = new RequestLine(createRequestLine(br));
+            param.addQueryString(requestLine.getQueryString());
+            processHeaders(br);
+            param.addQueryString(IOUtils.readData(br, header.getContentLength()));
             setCookies();
-
-            if (getMethod().isGet()) {
-                params = requestLine.getParams();
-            } else {
-                int contentLength = Integer.parseInt(headers.get("Content-Length"));
-                String queryString = IOUtils.readData(br, contentLength);
-                params = HttpRequestUtils.parseQueryString(queryString);
-            }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private String createRequestLine(BufferedReader br) throws IOException {
+        String line = br.readLine();
+        if (line == null) {
+            throw new IllegalStateException();
+        }
+        return line;
     }
 
     private void setCookies() {
@@ -66,11 +61,11 @@ public class HttpRequest {
     }
 
     public String getHeader(String key) {
-        return headers.get(key);
+        return header.get(key);
     }
 
     public String getParameter(String key) {
-        return params.get(key);
+        return param.get(key);
     }
 
     public String getCookie(String key) {
@@ -81,13 +76,10 @@ public class HttpRequest {
         return Boolean.parseBoolean(cookies.get("logined"));
     }
 
-
-    private void setHeaders(BufferedReader br) throws IOException {
+    private void processHeaders(BufferedReader br) throws IOException {
         String line;
         while (!"".equals(line = br.readLine())) {
-            log.debug("header: {}", line);
-            Pair pair = HttpRequestUtils.parseHeader(line);
-            headers.put(pair.getKey(), pair.getValue());
+            header.add(line);
         }
     }
 

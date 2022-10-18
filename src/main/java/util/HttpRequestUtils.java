@@ -12,13 +12,6 @@ import com.google.common.collect.Maps;
 
 public class HttpRequestUtils {
     private static final Logger log = LoggerFactory.getLogger(HttpRequestUtils.class);
-    
-    public static String getUri(String firstLine) {
-        log.debug(firstLine);
-        String path = firstLine.split(" ")[1];
-        return !"/".equals(path) ? path : "/index.html";
-    }
-
     /**
      * @param queryString은 URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
      * @return

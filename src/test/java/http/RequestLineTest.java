@@ -1,11 +1,8 @@
-package webserver;
+package http;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-
-import http.HttpMethod;
-import http.RequestLine;
 
 public class RequestLineTest {
 
@@ -18,8 +15,7 @@ public class RequestLineTest {
         
         line = "GET /user/create?userId=javajigi&password=password&name=JaeSung HTTP/1.1";
         requestLine = new RequestLine(line);
-        assertEquals(3, requestLine.getParams().size());
-        assertEquals("javajigi", requestLine.getParams().get("userId"));
+        assertEquals("userId=javajigi&password=password&name=JaeSung", requestLine.getQueryString());
     }
     
     @Test
