@@ -9,6 +9,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import http.HttpMethod;
+
 public class MapTest {
     private static final Logger log = LoggerFactory.getLogger(MapTest.class);
 

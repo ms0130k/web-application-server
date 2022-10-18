@@ -52,7 +52,7 @@ public class HttpRequest {
         }
     }
 
-    public HttpMethod getMethod() throws IOException {
+    public HttpMethod getMethod() {
         return requestLine.getMethod();
     }
 
