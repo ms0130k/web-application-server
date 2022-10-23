@@ -5,14 +5,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import util.HttpRequestUtils;
 import util.IOUtils;
 
 public class HttpRequest {
@@ -20,8 +17,7 @@ public class HttpRequest {
     private RequestLine requestLine;
     private HttpHeader header = new HttpHeader();
     private RequestParam param = new RequestParam();
-    
-    private Map<String, String> cookies = new HashMap<String, String>();
+    private HttpCookie cookie;
 
     public HttpRequest(InputStream in) {
         try {
@@ -46,9 +42,9 @@ public class HttpRequest {
     }
 
     private void setCookies() {
-        String cookie = getHeader("Cookie");
-        if (StringUtils.isNotBlank(cookie)) {
-            cookies = HttpRequestUtils.parseCookies(cookie);
+        String cookieValue = getHeader("Cookie");
+        if (StringUtils.isNotBlank(cookieValue)) {
+            cookie = new HttpCookie(cookieValue);
         }
     }
 
@@ -69,11 +65,11 @@ public class HttpRequest {
     }
 
     public String getCookie(String key) {
-        return cookies.get(key);
+        return cookie.get(key);
     }
     
     public boolean isLogined() {
-        return Boolean.parseBoolean(cookies.get("logined"));
+        return Boolean.parseBoolean(cookie.get("logined"));
     }
 
     private void processHeaders(BufferedReader br) throws IOException {
