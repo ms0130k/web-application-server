@@ -4,19 +4,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpSession {
-    private static Map<String, HttpSession> sessions = new HashMap<String, HttpSession>();
+    private static Map<String, Object> values = new HashMap<String, Object>();
+    
+    private String id;
 
-    public static HttpSession get(String id) {
-        HttpSession session = sessions.get(id);
-        
-        if (session == null) {
-            session = new HttpSession();
-            sessions.put(id, session);
-        }
-        return session;
+    protected HttpSession(String id) {
+        this.id = id;
     }
     
-    static void remove(String id) {
-        sessions.remove(id);
+    public String getId() {
+        return id;
+    }
+    
+    public void setAttribute(String key, Object value) {
+        values.put(key, value);
+    }
+    
+    public Object getAttrubute(String key) {
+        return values.get(key);
+    }
+    
+    public void removeAttribute(String key) {
+        values.remove(key);
+    }
+    
+    public void invalidate() {
+        HttpSessions.remove(id);
     }
 }

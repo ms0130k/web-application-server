@@ -8,8 +8,8 @@ import http.HttpRequest;
 import http.HttpResponse;
 import model.User;
 
-public class ControllerUserCreation extends AbstractController {
-    private static final Logger log = LoggerFactory.getLogger(ControllerUserCreation.class);
+public class UserCreationController extends AbstractController {
+    private static final Logger log = LoggerFactory.getLogger(UserCreationController.class);
 
     @Override
     public void doPost(HttpRequest request, HttpResponse response) {
@@ -18,10 +18,5 @@ public class ControllerUserCreation extends AbstractController {
         log.debug("User: {}", user);
         DataBase.addUser(user);
         response.sendRedirect("/index.html");
-    }
-
-    @Override
-    protected void doGet(HttpRequest request, HttpResponse response) {
-        log.debug("method: {}", request.getMethod());
     }
 }

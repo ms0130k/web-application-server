@@ -1,0 +1,7 @@
+
+java.util.Map<String, String> map = new java.util.HashMap<String, String>();
+
+map.put("abc", "def");
+map.put("abc", "def");
+map.put("abc", "def");
+System.out.println(map);

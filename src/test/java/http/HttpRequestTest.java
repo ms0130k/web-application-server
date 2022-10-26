@@ -27,7 +27,6 @@ public class HttpRequestTest {
         assertEquals("/user/create", request.getPath());
         assertEquals("keep-alive", request.getHeader("Connection"));
         assertEquals("javajigi", request.getParameter("userId"));
-        assertEquals(true, request.isLogined());
     }
 
     @Test

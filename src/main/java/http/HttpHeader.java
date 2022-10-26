@@ -11,6 +11,7 @@ import util.HttpRequestUtils.Pair;
 
 public class HttpHeader {
     private static final String CONTENT_LENGTH = "Content-Length";
+    private static final String COOKIE = "Cookie";
     private static final Logger log = LoggerFactory.getLogger(HttpHeader.class);
     private Map<String, String> headers = new HashMap<String, String>();
 
@@ -31,5 +32,13 @@ public class HttpHeader {
     int getInt(String key) {
         String header = get(key);
         return header == null ? 0 : Integer.parseInt(header);
+    }
+    
+    HttpCookie getCookie() {
+        return new HttpCookie(headers.get(COOKIE));
+    }
+    
+    HttpSession getSession() {
+        return HttpSessions.get(getCookie().get(HttpSessions.SESSION_ID_NAME));
     }
 }
